@@ -1,0 +1,95 @@
+﻿@page "/c"
+
+@using WebApiEjemplo.Models
+@using WebApiEjemplo.Services
+@inject NavigationManager Navigator;
+@inject ICategoriasService service
+
+@if (_categorias == null)
+{
+    <p>Cargando...</p>
+}
+else
+{   
+    <div class="container">
+        <div class="row">
+            @foreach (var categoria in _categorias)
+            {
+
+                <div class="col-md-4 mb-4">
+                    <div class="card p-2 ">
+                        <img src="@categoria.image" class="card-img-top">
+
+                        <div class="card-body">
+                            <h5 class="card-title">@categoria.name</h5>
+                            <div class="flex justify-content-between">
+                                <button class="btn btn-danger btn-sm" @onclick="() => EliminarCategoria(categoria.id)">Eliminar</button>
+                                <button class="btn btn-primary btn-sm" @onclick="Dialogo">Editar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+       
+                <br />
+
+                @if (showModal)
+                {
+                    <div class="p-3 m-2 border border-dark">
+                        <h4>Actualizar Categoria</h4>
+                        <div class="text-center">
+                            <input class="input-group-sm w-100" type="text" @bind="newName" placeholder="Nombre de la categoría" />
+                            <div class="flex justify-content-between p-1">
+                                <button class="btn btn-success" @onclick="()=> ActualizarCategoria(categoria.id)">Crear</button>
+                                <button class="btn btn-secondary" @onclick="Dialogo">Cancelar</button>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+            }
+        </div>
+    </div>
+}
+
+@code {
+    List<Categoria> _categorias;
+    bool showModal = false;
+    string newName = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        _categorias = await service.ObtenerCategorias();
+    }
+
+    private async Task EliminarCategoria(int categoriaId)
+    {
+        bool exito = await service.Eliminar(categoriaId);
+        if (exito)
+        {
+
+            _categorias = await service.ObtenerCategorias();
+        }
+    }
+
+    private async void ActualizarCategoria(int id)
+    {
+
+        var error = !await service.ActualizarCategoria(id, newName);
+
+        if (error)
+        {
+            _categorias = await service.ObtenerCategorias();
+            Navigator.NavigateTo("/c", true);
+        }
+        showModal = false;
+
+    }
+
+
+    private void Dialogo()
+    {
+        showModal = !showModal;
+    }
+
+
+}

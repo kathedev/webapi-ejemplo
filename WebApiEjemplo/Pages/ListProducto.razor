@@ -1,0 +1,40 @@
+﻿@page "/productos"
+
+@using WebApiEjemplo.Models
+@using WebApiEjemplo.Services
+@inject IProductService service
+
+
+<h3>Productos</h3>
+
+@if (_productos == null)
+{
+	<p>Cargando...</p>
+}
+else
+{
+	<div class="container">
+		<div class="row">
+			@foreach (var producto in _productos)
+			{
+
+				<div class="col-md-4 mb-4">
+					<div class="card p-2 ">
+						<img src="@producto.images.FirstOrDefault()" class="card-img-top">
+						<div class="card-body">
+							<h2 class="card-title">@producto.title</h2>
+						</div>
+					</div>
+				</div>
+
+			}
+		</div>
+	</div>
+}
+@code {
+	private List<Producto> _productos;
+	protected override async Task OnInitializedAsync()
+	{
+		_productos = await service.Obtener();
+	}
+}

@@ -1,0 +1,40 @@
+﻿@page "/Post"
+
+@using WebApiEjemplo.Models
+@using WebApiEjemplo.Services
+@inject ICategoriasService Service
+
+<h3>Nueva Categoria</h3>
+
+<div>
+    <h4>Crear Nueva Categoría</h4>
+    <div>
+        <input type="text" @bind="nombre" placeholder="Nombre de la categoría" />
+        <button @onclick="CrearCategoria">Crear</button>
+    </div>
+
+    <h2>@errorVar</h2>
+</div>
+
+@code {
+    private string errorVar;
+    string nombre = "";
+
+    private async Task CrearCategoria()
+    {
+        Categoria _nuevaCategoria = new Categoria { name = nombre, image = "https://picsum.photos/200/300" };
+
+        var cat = await Service.CrearCategoria(_nuevaCategoria);
+
+        if(cat != null)
+        {
+            errorVar = "Publicado con exito";
+        }
+        else
+        {
+            errorVar = "Ocurrio un error";
+        }
+
+    }
+
+}
